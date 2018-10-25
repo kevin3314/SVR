@@ -37,8 +37,6 @@ except IndexError:
 """
 
 (xlist, ylist, data_dim) = func.get_datalist(file_name)
-xlist = func.normal_list(xlist)
-ylist = func.normal_list(ylist)
 
 svr = svr.Svr(xlist, ylist, data_dim, kernel_number, "tetete", 0.1, 1000, {})
 svr.solve()

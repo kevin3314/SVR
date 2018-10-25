@@ -41,6 +41,7 @@ class Svr:
         d_n = len(x_list)
         self.data_dim = data_dim
         self.write_name = write_name
+        self.epsilon = epsilon
 
         #各係数を設定する.
         self.q = np.zeros(self.N)
@@ -50,20 +51,22 @@ class Svr:
             else:
                 self.q[i] = y_list[i - (d_n)] + epsilon
         self.q = matrix(self.q)
-        self.G = np.zeros((self.N, self.N))
-        for i in range(self.N):
-            for j in range(self.N):
-                if i <= (d_n):
+       
+        
+        self.G = np.zeros((2* self.N, self.N))
+        for j in range(self.N):
+            for i in range(2*self.N):
+                if j < self.N:
                     if i == j:
-                        self.G[i,j] = -1
+                        self.G[i,j] = -1.0
                 else:
-                    if (i-d_n) == j:
-                        self.G[i,j] == 1 
-
+                    if i == (j-self.N):
+                        self.G[i,j] = 1.0
         self.G = matrix(self.G)
+        
 
-        tmp_l1 = np.zeros((d_n))
-        tmp_l2 = cost * np.ones((d_n))
+        tmp_l1 = np.zeros((self.N))
+        tmp_l2 = cost * np.ones((self.N))
         self.h = np.hstack((tmp_l1, tmp_l2))
         self.h = matrix(self.h)
 
@@ -72,11 +75,9 @@ class Svr:
         tmp_l1 = np.ones((1, d_n))
         tmp_l2 = -1 * np.ones((1, d_n))
         self.A = np.hstack((tmp_l1, tmp_l2))
-        print(self.A)
         self.A = matrix(self.A)
 
         self.P = np.zeros((self.N, self.N))
-        #バグあり
         for i in range(self.N):
             for j in range(self.N):
                 if ( i < d_n and j < d_n or  i > d_n and j > d_n ):
@@ -91,22 +92,12 @@ class Svr:
                         self.P[i, j] = 0.5 * self.kernel( self.x_list[i], self.x_list[j-d_n])
                     else:
                         self.P[i, j] = 0.5 * self.kernel( self.x_list[i-d_n], self.x_list[j-d_n])
-
-        self.P = matrix(self.P) 
-
-    def set_pera(self, p_dict):
-        #パラメタのハッシュを受け取ってパラメタを設定し直す。
-        self.kernel_class = self.kernel_class.set_pera(p_dict)
-        self.kernel = self.kernel_class.return_fun()
-        self.P = np.zeros((self.N, self.N))
-        for i in range(self.N):
-            for j in range(self.N):
-                self.P[i, j] = self.kernel( self.x_list[i], self.x_list[j]) * self.y_list[i] * self.y_list[j]
-        self.P = matrix(self.P) 
         
+        self.P = matrix(self.P) 
 
     def solve(self):
         sol = solvers.qp(P=self.P, q=self.q, G=self.G, h=self.h, A=self.A, b=self.b) 
+        d_n = len(self.x_list)
         #alphaのリストを作る
         alpha_list = []
         #サポートベクタの番号を覚えておく
@@ -124,10 +115,10 @@ class Svr:
         self.w = w
         #閾値を計算する
         if sup_number < d_n:
-            self.shita = - self.y_list[sup_number] + epsilon  
+            self.shita = - self.y_list[sup_number] + self.epsilon  
             for i in range(d_n):
-                self.shita += (alpha_list[i]-alpha_list[d_n+i]) * np.dot(x_list[sup_number], x_list[i])
+                self.shita += (alpha_list[i]-alpha_list[d_n+i]) * np.dot(self.x_list[sup_number], self.x_list[i])
         else:
-            self.shita = - self.y_list[sup_number] - epsilon  
+            self.shita = - self.y_list[sup_number-d_n] - self.epsilon  
             for i in range(d_n):
-                self.shita += (alpha_list[i]-alpha_list[d_n+i]) * np.dot(x_list[sup_number], x_list[i])
+                self.shita += (alpha_list[i]-alpha_list[d_n+i]) * np.dot(self.x_list[sup_number-d_n], self.x_list[i])
