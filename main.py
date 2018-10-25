@@ -1,8 +1,7 @@
-import SVM as svm
+import svr
 import sys
 import func
 import datetime
-import cr_vd as cr
 
 #コマンドラインから引数を受け取る
 args = sys.argv
@@ -23,6 +22,7 @@ except IndexError:
 3:シグモイドカーネル""")
     sys.exit()
 
+"""
 try:
     cross_n = args[3]
 except IndexError:
@@ -34,9 +34,11 @@ except IndexError:
     today = datetime.datetime.today()
     day = str(today.year)+str(today.month)+str(today.day)+str(today.hour)+str(today.minute)+str(today.second)
     write_name = day
+"""
 
 (xlist, ylist, data_dim) = func.get_datalist(file_name)
 xlist = func.normal_list(xlist)
 ylist = func.normal_list(ylist)
-inst = cr.val_class(xlist, ylist, data_dim, kernel_number, write_name, cross_n)
-inst.sol_pera()
+
+svr = svr.Svr(xlist, ylist, data_dim, kernel_number, "tetete", 0.1, 1000, {})
+svr.solve()

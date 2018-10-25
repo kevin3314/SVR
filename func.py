@@ -132,9 +132,9 @@ def get_datalist(file_name):
                 a = np.zeros(n)
                 for i, x in enumerate(s_line):
                     if i == n:
-                        y_list.append(int(x))
+                        y_list.append(float(x))
                     else: 
-                        a[i] = int(x) 
+                        a[i] = float(x) 
                 x_list.append(a) 
 
     except FileNotFoundError:
