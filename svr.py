@@ -56,12 +56,13 @@ class Svr:
         self.G = np.zeros((2* self.N, self.N))
         for j in range(self.N):
             for i in range(2*self.N):
-                if j < self.N:
+                if i < self.N:
                     if i == j:
                         self.G[i,j] = -1.0
                 else:
-                    if i == (j-self.N):
+                    if (i - self.N == j):
                         self.G[i,j] = 1.0
+        print(self.G)
         self.G = matrix(self.G)
         
 
@@ -82,17 +83,17 @@ class Svr:
             for j in range(self.N):
                 if ( i < d_n and j < d_n or  i > d_n and j > d_n ):
                     if i < d_n:
-                        self.P[i, j] = 0.5 * self.kernel( self.x_list[i], self.x_list[j])
+                        self.P[i, j] = self.kernel( self.x_list[i], self.x_list[j])
                     else:
-                        self.P[i, j] = 0.5 * self.kernel( self.x_list[i-d_n], self.x_list[j-d_n])
+                        self.P[i, j] = self.kernel( self.x_list[i-d_n], self.x_list[j-d_n])
                 else:
                     if i >= d_n and j < d_n:
-                        self.P[i, j] = 0.5 * self.kernel( self.x_list[i-d_n], self.x_list[j])
+                        self.P[i, j] = -1 * self.kernel( self.x_list[i-d_n], self.x_list[j])
                     elif i < d_n and j >= d_n:
-                        self.P[i, j] = 0.5 * self.kernel( self.x_list[i], self.x_list[j-d_n])
+                        self.P[i, j] = -1 * self.kernel( self.x_list[i], self.x_list[j-d_n])
                     else:
-                        self.P[i, j] = 0.5 * self.kernel( self.x_list[i-d_n], self.x_list[j-d_n])
-        
+                        self.P[i, j] = self.kernel( self.x_list[i-d_n], self.x_list[j-d_n])
+        print(self.P)
         self.P = matrix(self.P) 
 
     def solve(self):
