@@ -6,7 +6,7 @@ import sys
 import error
 
 class Svr:
-    def __init__(self, x_list, y_list, data_dim, kernel, write_name, epsilon, cost, p_dict={}): 
+    def __init__(self, x_list, y_list, data_dim, kernel, p_dict={}): 
         """
         x_list : データのリスト
         y_list : 分類の値のリスト
@@ -19,7 +19,6 @@ class Svr:
         kernel: カーネル関数
         N : データの数*2
         data_dim : それぞれのデータの次元
-        write_name : 結果を書き出すファイル名
         epsilon : 許す誤差の幅epsilon
         cost: モデルの単純さ
         """
@@ -40,8 +39,9 @@ class Svr:
         self.N = 2 * len(x_list)
         d_n = len(x_list)
         self.data_dim = data_dim
-        self.write_name = write_name
+        epsilon = p_dict["epsilon"]
         self.epsilon = epsilon
+        cost = p_dict["cost"]
 
         #各係数を設定する.
         self.q = np.zeros(self.N)
@@ -62,7 +62,6 @@ class Svr:
                 else:
                     if (i - self.N == j):
                         self.G[i,j] = 1.0
-        print(self.G)
         self.G = matrix(self.G)
         
 
@@ -93,7 +92,6 @@ class Svr:
                         self.P[i, j] = -1 * self.kernel( self.x_list[i], self.x_list[j-d_n])
                     else:
                         self.P[i, j] = self.kernel( self.x_list[i-d_n], self.x_list[j-d_n])
-        print(self.P)
         self.P = matrix(self.P) 
 
     def solve(self):
@@ -108,11 +106,10 @@ class Svr:
             if sol['x'][i,0] > 0.1:
                 sup_number = i
         self.alpha_list = alpha_list
-        print(alpha_list)
         #重みを計算する
         w = np.zeros(self.data_dim)
         for i in range(d_n):
-            w += self.x_list[i] * (alpha_list[i]-alpha_list[d_n+i])
+            w = w + self.x_list[i] * (alpha_list[i]-alpha_list[d_n+i])
         self.w = w
         #閾値を計算する
         if sup_number < d_n:
@@ -123,3 +120,22 @@ class Svr:
             self.shita = - self.y_list[sup_number-d_n] - self.epsilon  
             for i in range(d_n):
                 self.shita += (alpha_list[i]-alpha_list[d_n+i]) * np.dot(self.x_list[sup_number-d_n], self.x_list[i])
+
+    def eval(self,test_x_list, test_y_list):
+        #SVRの精度を平均二乗誤差を求めることによって計算する
+        sum = 0
+        if self.kernel_number == 0:
+            for x,y in zip(test_x_list, test_y_list):
+                result = np.dot(self.w, x) - self.shita
+                sum += pow( y-result, 2)
+            return(sum / len(test_x_list))
+
+        else:
+            d_n = len(self.x_list)
+            for x,y in zip(test_x_list, test_y_list):
+                result = 0
+                for m in range(len(self.x_list)):
+                    result += (self.alpha_list[m]-self.alpha_list[d_n+m])* self.kernel(x, self.x_list[m])
+                result -= self.shita
+                sum += pow(y-result, 2)
+            return(sum / len(test_x_list))
