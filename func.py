@@ -4,6 +4,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import error
+import pandas as pd
 
 #データをスケーリングする関数。単純に[0,1]にスケーリングする
 def normal_list(l):
@@ -127,6 +128,7 @@ def get_datalist(file_name):
             """
             n = 0
             for s_line in f:
+                #s_line -> [1.3, 3.3, ... , 1.4]
                 s_line = s_line.split(",")
                 n = len(s_line) -1
                 a = np.zeros(n)
@@ -142,108 +144,31 @@ def get_datalist(file_name):
         sys.exit()
     return (x_list, y_list, n)
 
-def graph_dot(x_list, y_list, weight, shita, write_name):
-    """
-    Xr,Yr,Xb,Yb: ラベル付けに応じて分類したデータ群
-    """
-    Xr = []
-    Yr = []
-    Xb = []
-    Yb = []
+def perse_csv(file_name):
+    csv_data = pd.read_csv("sanfran.csv")
+    x_list = []
+    y_list = []
+    #属性として指定するリスト
+    taget_list = ["accommodates","availability_365", "number_of_reviews"]
+    list_of_paralist = []
+    for att in taget_list:
+        tmp_list = [x for x in csv_data[att]]
+        new_list = [x / max(tmp_list) for x in tmp_list]
+        list_of_paralist.append(new_list)
 
-    #各データについてラベルを確認し分類する。
-    for i, x in enumerate(x_list):
-        if y_list[i] == 1.0:
-            Xr.append(x[0])
-            Yr.append(x[1])
-        else:
-            Xb.append(x[0])
-            Yb.append(x[1])
-    plt.scatter(Xr, Yr, c='red')
-    plt.scatter(Xb, Yb, c='blue')
+    dim = len(list_of_paralist)
+    vec_n = len(list_of_paralist[0])
 
-    #識別器(直線)を表示する。
-    X = np.linspace(np.max(x_list), np.min(x_list), 1000)
-    y = (-1 * X * weight[0] / weight[1]) + shita / weight[1]
-    plt.plot(X,y)
-    #画像として保存　
-    plt.savefig(write_name + '.png')
+    for i in range(vec_n): 
+        a = np.zeros(dim)
+        for j,l in enumerate(list_of_paralist):
+            a[j] = float(l[i])
+        x_list.append(a)
 
-def graph_ker(x_list, y_list, alpha_list, shita, kernel, write_name):
-    #カーネルの場合識別器を図示する関数
-    Xr = []
-    Yr = []
-    Xb = []
-    Yb = []
+    pricelist = [x[1:] for x in csv_data["price"]]
 
-    div_number = 50
-    large = np.max(x_list)
-    mini = np.min(x_list)
-    grid_x = div_grid(large, mini, div_number)
-    grid_y = div_grid(large, mini, div_number) 
-
-    for i in range(div_number):
-        for j in range(div_number):
-            x = np.array([grid_x[i], grid_y[j]])
-            result = 0.0
-            for m in range(len(x_list)):
-                result += alpha_list[m] * y_list[m] * kernel(x, x_list[m])
-            result -= shita
-            if result > 0.0:
-                Xr.append(x[0])
-                Yr.append(x[1])
-            else:
-                Xb.append(x[0])
-                Yb.append(x[1]) 
-
-    plt.scatter(Xr, Yr, 10, c='g')
-    plt.scatter(Xb, Yb, 10, c='y')
-
-    Xr = []
-    Yr = []
-    Xb = []
-    Yb = []
-
-    #各データについてラベルを確認し分類する。
-    for i, x in enumerate(x_list):
-        if y_list[i] == 1.0:
-            Xr.append(x[0])
-            Yr.append(x[1])
-        else:
-            Xb.append(x[0])
-            Yb.append(x[1])
-    plt.scatter(Xr, Yr, c='red')
-    plt.scatter(Xb, Yb, c='blue')
-
-    plt.savefig(write_name + '.png')
-
-def graph_pera(score_l, pera_l, write_name):
-    plt.figure()
-    plt.plot(pera_l, score_l)
-    plt.savefig(write_name + "-peraList.png")
-
-def graph_two_pera(score_l, pera1_l, pera2_l, write_name):
-    plt.figure()
-
-    Xr = []
-    Yr = []
-    Xb = []
-    Yb = []
-    Xc = []
-    Yc = []
-    #各データについてラベルを確認し分類する。
-    for i, x in enumerate(pera1_l):
-        if score_l[i] > 0.90:
-            Xr.append(pera1_l[i])
-            Yr.append(pera2_l[i])
-        elif score_l[i] > 0.72:
-            Xc.append(pera1_l[i])
-            Yc.append(pera2_l[i])
-        else:
-            Xb.append(pera1_l[i])
-            Yb.append(pera2_l[i])
-
-    plt.scatter(Xr, Yr, c='red')
-    plt.scatter(Xc, Yc, c='y')
-    plt.scatter(Xb, Yb, c='blue')
-    plt.savefig(write_name + '-peraList.png')
+    for i in range(vec_n):
+        a = np.zeros(1)
+        a[0] = float(pricelist[i].replace(',', ''))
+        y_list.append(a)
+    return (x_list[::60], y_list[::60], dim)

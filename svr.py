@@ -1,8 +1,8 @@
 import numpy as np
-import cvxopt
+import cvxopt 
 import func 
 from cvxopt import matrix, solvers 
-import sys
+import sys 
 import error
 
 class Svr:
@@ -122,13 +122,13 @@ class Svr:
                 self.shita += (alpha_list[i]-alpha_list[d_n+i]) * np.dot(self.x_list[sup_number-d_n], self.x_list[i])
 
     def eval(self,test_x_list, test_y_list):
-        #SVRの精度を平均二乗誤差を求めることによって計算する
-        sum = 0
+        #SVRの精度を絶対値の差の誤差を求めることによって計算する
+        sumary = 0
         if self.kernel_number == 0:
             for x,y in zip(test_x_list, test_y_list):
                 result = np.dot(self.w, x) - self.shita
-                sum += pow( y-result, 2)
-            return(sum / len(test_x_list))
+                sumary += abs(y-result)
+            return(sumary / len(test_x_list))
 
         else:
             d_n = len(self.x_list)
@@ -137,5 +137,5 @@ class Svr:
                 for m in range(len(self.x_list)):
                     result += (self.alpha_list[m]-self.alpha_list[d_n+m])* self.kernel(x, self.x_list[m])
                 result -= self.shita
-                sum += pow(y-result, 2)
-            return(sum / len(test_x_list))
+                sumary += abs(y-result)
+            return(sumary / len(test_y_list))

@@ -3,6 +3,7 @@ import sys
 import func
 import datetime
 import cr_vd
+import re
 
 #コマンドラインから引数を受け取る
 args = sys.argv
@@ -35,7 +36,14 @@ except IndexError:
     day = str(today.year)+str(today.month)+str(today.day)+str(today.hour)+str(today.minute)+str(today.second)
     write_name = day
 
-(xlist, ylist, data_dim) = func.get_datalist(file_name)
+#csvかどうかを判定
+pattern = ".*\.csv"
+result = re.match(pattern, file_name)
+
+if result:
+    (xlist, ylist, data_dim) = func.perse_csv(file_name)
+else:
+    (xlist, ylist, data_dim) = func.get.datalist(filename)
 
 cr_vd = cr_vd.val_class(xlist, ylist, data_dim, kernel_number, cross_n)
 cr_vd.sol_pera()

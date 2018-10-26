@@ -82,9 +82,9 @@ class val_class():
             #ガウス,多項式カーネルの時
             p_dict = {} 
             score_dict = {}
-            for i in [1, 10, 100, 1000]:
+            for i in [100, 1000]:
                 for j in [ 0.1*x for x in range(1,10,2)]:
-                    for k in range(200,300,5):
+                    for k in range(100,200,5):
                         p_dict["cost"] = i
                         p_dict["epsilon"] = j
                         p_dict["p1"] = k
