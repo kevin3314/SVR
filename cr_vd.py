@@ -30,14 +30,12 @@ class val_class():
         except ValueError:
             print("分割する値は自然数である必要があります")
             sys.exit()
-
         div_x_list = func.div_list(self.x_list,cross_n)
         div_y_list = func.div_list(self.y_list,cross_n)
         #学習に用いるリスト、正解率のリストを作る
         learn_x_list= []
         learn_y_list= []
         cor_per_list = []
-
         for i in range(cross_n):
             #i番目のリストをテスト用とし他のデータで学習する。
             for m in range(cross_n):
@@ -60,7 +58,8 @@ class val_class():
         for x in cor_per_list:
             average += x
         return (average / len(cor_per_list))
-        
+
+
     def sol_pera(self):
         """
         パラメタを探索する関数。最後に一番よかったパラメタを用いて学習しその結果を出力する。
@@ -80,8 +79,7 @@ class val_class():
             print("最良パラメタ:->" + max(score_dict, key=score_dict.get) + "最良スコア->" + str(max(score_dict.values()) ))
 
         elif self.kernel_number == 2 or self.kernel_number == 1:
-            #ガウスカーネルの時
-            #パラメタとスコアの列を保持しておく
+            #ガウス,多項式カーネルの時
             p_dict = {} 
             score_dict = {}
             for i in [1, 10, 100, 1000]:
@@ -99,36 +97,19 @@ class val_class():
 
         else:
             #シグモイドカーネルの時 
-            #スコアとその時のパラメタを保持するハッシュ
             score_dict = {}
             #それぞれのパラメタについて順に検定を行う
-            for i in [ 0.1*x for x in range(1,10,2)]:
-                for j in [0.1*x for x in range(1,10,2)]:
-                    p_dict = {"p1": i, "p2": j}
-                    score = self.validate(p_dict)
-                    x1 = str(i)
-                    x2 = str(j)
-                    score_dict[x1+","+x2] = score
+            for c in [1,10,100,1000]:
+                for e in [0.1*x for x in range(1,10,2)]:
+                    for i in [ 0.1*x for x in range(1,10,2)]:
+                        for j in [0.1*x for x in range(1,10,2)]:
+                            p_dict = {"p1": i, "p2": j, "cost":c, "epsilon":e}
+                            score = self.validate(p_dict)
+                            x1 = str(c)
+                            x2 = str(e)
+                            x3 = str(i)
+                            x4 = str(j)
+                            
+                            score_dict["Cost-"+x1+"epsilon-"+x2+"p1-"+x3+"p2-"+x4] = score
             #最良スコアの値とパラメタを表示する
             print("最良パラメタ:->" + max(score_dict, key=score_dict.get) + "最良スコア->" + str(max(score_dict.values()) ))
-            tmp_l =(max(score_dict, key=score_dict.get)).split(",")
-            #最良スコアの時のパラメタで識別器を構成する
-            x1 = float(tmp_l[0])
-            x2 = float(tmp_l[1])
-            p_dict = {"p1": x1, "p2": x2}
-            inst = svm.Svm(self.x_list, self.y_list, self.data_dim, self.kernel_number, self.write_name, p_dict)
-            inst.solve()
-            inst.plot() 
-
-            pera1_list = []
-            pera2_list = []
-            score_list = []
-            #パラメタについてのグラフを作る
-            for item in score_dict.items():
-                pera_list = item[0].split(",")
-                pera1 = float(pera_list[0])
-                pera2 = float(pera_list[1])
-                pera1_list.append(pera1)
-                pera2_list.append(pera2)
-                score_list.append(item[1])
-            func.graph_two_pera(score_list, pera1_list, pera2_list, self.write_name)
