@@ -43,7 +43,7 @@ result = re.match(pattern, file_name)
 if result:
     (xlist, ylist, data_dim) = func.perse_csv(file_name)
 else:
-    (xlist, ylist, data_dim) = func.get.datalist(filename)
+    (xlist, ylist, data_dim) = func.get_datalist(file_name)
 
 cr_vd = cr_vd.val_class(xlist, ylist, data_dim, kernel_number, cross_n)
 cr_vd.sol_pera()
