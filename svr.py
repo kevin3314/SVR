@@ -113,13 +113,13 @@ class Svr:
         self.w = w
         #閾値を計算する
         if sup_number < d_n:
-            self.shita = - self.y_list[sup_number] + self.epsilon  
+            self.shita = -self.y_list[sup_number] + self.epsilon  
             for i in range(d_n):
-                self.shita += (alpha_list[i]-alpha_list[d_n+i]) * np.dot(self.x_list[sup_number], self.x_list[i])
+                self.shita += (alpha_list[i]-alpha_list[d_n+i]) * self.kernel(self.x_list[sup_number], self.x_list[i])
         else:
             self.shita = - self.y_list[sup_number-d_n] - self.epsilon  
             for i in range(d_n):
-                self.shita += (alpha_list[i]-alpha_list[d_n+i]) * np.dot(self.x_list[sup_number-d_n], self.x_list[i])
+                self.shita += (alpha_list[i]-alpha_list[d_n+i]) * self.kernel(self.x_list[sup_number-d_n], self.x_list[i])
 
     def eval(self,test_x_list, test_y_list):
         #SVRの精度を絶対値の差の誤差を求めることによって計算する
