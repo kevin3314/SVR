@@ -85,7 +85,7 @@ class val_class():
             print(p_dict2)
             inst = svr.Svr(self.x_list,self.y_list, self.data_dim, self.kernel_number, p_dict2)
             inst.solve()
-            func.plot(inst.shita, self.x_list, inst.w, inst.kernel_number, inst.kernel)
+            inst.plot()
 
 
         elif(self.kernel_number == 2 or self.kernel_number == 1):
