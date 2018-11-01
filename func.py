@@ -150,10 +150,23 @@ def perse_csv(file_name):
     y_list = []
     #属性として指定するリスト
     taget_list = ["accommodates","availability_365", "number_of_reviews"]
+    taget_list2 = ["security_deposit"]
+
     list_of_paralist = []
     for att in taget_list:
         tmp_list = [x for x in csv_data[att]]
         new_list = [x / max(tmp_list) for x in tmp_list]
+        list_of_paralist.append(new_list)
+
+    for att in taget_list2:
+        tmp_list = [x for x in csv_data[att]]
+        tmp_list2 = []
+        for x in tmp_list:
+            if (type(x) is str):
+                tmp_list2.append(float(x[1:].replace(',', '')))
+            else:
+                tmp_list2.append(0.0)
+        new_list = [x / max(tmp_list2) for x in tmp_list2]
         list_of_paralist.append(new_list)
 
     dim = len(list_of_paralist)
