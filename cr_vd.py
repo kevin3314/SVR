@@ -74,11 +74,22 @@ class val_class():
                     p_dict["epsilon"] = j
                     x1 = str(i)
                     x2 = str(j)
-                    score_dict["Cost-"+x1+"epsilon-"+x2] = self.validate(p_dict)
+                    score_dict["cost-"+x1+"/epsilon-"+x2] = self.validate(p_dict)
                     
             print("最良パラメタ:->" + max(score_dict, key=score_dict.get) + "最良スコア->" + str(max(score_dict.values()) ))
+            tmp_list = max(score_dict, key=score_dict.get).split("/")
+            print(tmp_list)
+            p_dict2 = {}
+            for l in tmp_list:
+                t_list = l.split("-")
+                p_dict2[t_list[0]] = float(t_list[1])
+            print(p_dict2)
+            inst = svr.Svr(self.x_list,self.y_list, self.data_dim, self.kernel_number, p_dict)
+            inst.solve()
+            func.plot(inst.shita, self.x_list, inst.w, inst.kernel_number, inst.kernel)
 
-        elif self.kernel_number == 2 or self.kernel_number == 1:
+
+        elif(self.kernel_number == 2 or self.kernel_number == 1):
             #ガウス,多項式カーネルの時
             p_dict = {} 
             score_dict = {}
@@ -94,6 +105,7 @@ class val_class():
                         score_dict["Cost-"+x1+"epsilon-"+x2+"p1-"+x3] = self.validate(p_dict)
                     
             print("最良パラメタ:->" + max(score_dict, key=score_dict.get) + "最良スコア->" + str(max(score_dict.values()) ))
+            
 
         else:
             #シグモイドカーネルの時 

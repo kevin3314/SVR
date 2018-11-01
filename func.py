@@ -1,10 +1,10 @@
 import numpy as np
 import sys
 import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import error
 import pandas as pd
+from mpl_toolkits.mplot3d import Axes3D
 
 #データをスケーリングする関数。単純に[0,1]にスケーリングする
 def normal_list(l):
@@ -172,3 +172,35 @@ def perse_csv(file_name):
         a[0] = float(pricelist[i].replace(',', ''))
         y_list.append(a)
     return (x_list[::60], y_list[::60], dim)
+
+def plot(shita, data_list, w, kernel_number, kernel):
+    x_list = []
+    y_list = []
+    for data in data_list:
+        x_list.append(data[0])
+        y_list.append(data[1])
+
+    max1 = max(x_list)
+    max2 = max(y_list)
+    min1 = min(x_list)
+    min2 = min(y_list)
+
+    x = np.arange(min1, max1, 0.1) 
+    y = np.arange(min2, max2, 0.1)
+
+    X, Y = np.meshgrid(x,y)
+
+    if kernel_number == 0:
+        Z = X*w[0] + Y*w[1] - shita
+        print(w)
+        print(shita)
+        fig = plt.figure()
+        ax = Axes3D(fig)
+        ax.set_xlabel("x[0]")
+        ax.set_ylabel("x[1]")
+        ax.set_zlabel("y")
+        ax.plot_wireframe(X, Y, Z)
+        plt.show()
+
+    else:
+       pass
