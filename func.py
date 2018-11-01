@@ -192,8 +192,6 @@ def plot(shita, data_list, w, kernel_number, kernel):
 
     if kernel_number == 0:
         Z = X*w[0] + Y*w[1] - shita
-        print(w)
-        print(shita)
         fig = plt.figure()
         ax = Axes3D(fig)
         ax.set_xlabel("x[0]")

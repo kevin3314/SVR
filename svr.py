@@ -106,20 +106,23 @@ class Svr:
             if sol['x'][i,0] > 0.1:
                 sup_number = i
         self.alpha_list = alpha_list
+        alpha_list2 = []
+        for i in range(int(len(alpha_list)/2), len(alpha_list)):
+            alpha_list2.append(alpha_list[i]) 
         #重みを計算する
         w = np.zeros(self.data_dim)
         for i in range(d_n):
-            w = w + self.x_list[i] * (alpha_list[i]-alpha_list[d_n+i])
+            w += self.x_list[i] * (alpha_list[i]-alpha_list2[i])
         self.w = w
         #閾値を計算する
         if sup_number < d_n:
             self.shita = -self.y_list[sup_number] + self.epsilon  
             for i in range(d_n):
-                self.shita += (alpha_list[i]-alpha_list[d_n+i]) * self.kernel(self.x_list[sup_number], self.x_list[i])
+                self.shita += (alpha_list[i]-alpha_list2[i]) * self.kernel(self.x_list[sup_number], self.x_list[i])
         else:
             self.shita = - self.y_list[sup_number-d_n] - self.epsilon  
             for i in range(d_n):
-                self.shita += (alpha_list[i]-alpha_list[d_n+i]) * self.kernel(self.x_list[sup_number-d_n], self.x_list[i])
+                self.shita += (alpha_list[i]-alpha_list2[i]) * self.kernel(self.x_list[sup_number-d_n], self.x_list[i])
 
     def eval(self,test_x_list, test_y_list):
         #SVRの精度を絶対値の差の誤差を求めることによって計算する

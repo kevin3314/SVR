@@ -76,15 +76,14 @@ class val_class():
                     x2 = str(j)
                     score_dict["cost-"+x1+"/epsilon-"+x2] = self.validate(p_dict)
                     
-            print("最良パラメタ:->" + max(score_dict, key=score_dict.get) + "最良スコア->" + str(max(score_dict.values()) ))
-            tmp_list = max(score_dict, key=score_dict.get).split("/")
-            print(tmp_list)
+            print("最良パラメタ:->" + min(score_dict, key=score_dict.get) + "最良スコア->" + str(min(score_dict.values()) ))
+            tmp_list = min(score_dict, key=score_dict.get).split("/")
             p_dict2 = {}
             for l in tmp_list:
                 t_list = l.split("-")
                 p_dict2[t_list[0]] = float(t_list[1])
             print(p_dict2)
-            inst = svr.Svr(self.x_list,self.y_list, self.data_dim, self.kernel_number, p_dict)
+            inst = svr.Svr(self.x_list,self.y_list, self.data_dim, self.kernel_number, p_dict2)
             inst.solve()
             func.plot(inst.shita, self.x_list, inst.w, inst.kernel_number, inst.kernel)
 
@@ -102,9 +101,9 @@ class val_class():
                         x1 = str(i)
                         x2 = str(j)
                         x3 = str(k)
-                        score_dict["Cost-"+x1+"epsilon-"+x2+"p1-"+x3] = self.validate(p_dict)
+                        score_dict["Cost-"+x1+"/epsilon-"+x2+"/p1-"+x3] = self.validate(p_dict)
                     
-            print("最良パラメタ:->" + max(score_dict, key=score_dict.get) + "最良スコア->" + str(max(score_dict.values()) ))
+            print("最良パラメタ:->" + min(score_dict, key=score_dict.get) + "最良スコア->" + str(min(score_dict.values()) ))
             
 
         else:
@@ -124,4 +123,4 @@ class val_class():
                             
                             score_dict["Cost-"+x1+"epsilon-"+x2+"p1-"+x3+"p2-"+x4] = score
             #最良スコアの値とパラメタを表示する
-            print("最良パラメタ:->" + max(score_dict, key=score_dict.get) + "最良スコア->" + str(max(score_dict.values()) ))
+            print("最良パラメタ:->" + min(score_dict, key=score_dict.get) + "最良スコア->" + str(min(score_dict.values()) ))
