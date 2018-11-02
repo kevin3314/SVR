@@ -114,6 +114,7 @@ class Svr:
         for i in range(int(len(alpha_list)/2), len(alpha_list)):
             alpha_list2.append(alpha_list[i]) 
         self.alpha_list2 = alpha_list2
+
         #重みを計算する
         w = np.zeros(self.data_dim)
         for i in range(d_n):
@@ -143,48 +144,48 @@ class Svr:
             for x,y in zip(test_x_list, test_y_list):
                 result = 0
                 for m in range(len(self.x_list)):
-                    result += (self.alpha_list[m]-self.alpha_list[d_n+m])* self.kernel(x, self.x_list[m])
+                    result += (self.alpha_list[m]-self.alpha_list2[m])* self.kernel(x, self.x_list[m])
                 result -= self.shita
                 sumary += abs(y-result)
             return(sumary / len(test_y_list))
 
     def plot(self):
-        x_list = []
-        y_list = []
-        for data in self.x_list:
-            x_list.append(data[0])
-            y_list.append(data[1])
+        if(data_dim == 2):
+            x_list = []
+            y_list = []
+            for data in self.x_list:
+                x_list.append(data[0])
+                y_list.append(data[1])
 
-        max1 = max(x_list)
-        max2 = max(y_list)
-        min1 = min(x_list)
-        min2 = min(y_list)
+            max1 = max(x_list)
+            max2 = max(y_list)
+            min1 = min(x_list)
+            min2 = min(y_list)
 
-        X1 = []
-        X2 = []
-        Y1 = []
-        for data, ans in zip(self.x_list, self.y_list):
-           X1.append(data[0])
-           X2.append(data[1])
-           Y1.append(ans)
+            X1 = []
+            X2 = []
+            Y1 = []
+            for data, ans in zip(self.x_list, self.y_list):
+               X1.append(data[0])
+               X2.append(data[1])
+               Y1.append(ans)
 
-        x = np.arange(min1, max1, 0.1) 
-        y = np.arange(min2, max2, 0.1)
+            x = np.arange(min1, max1, 0.1) 
+            y = np.arange(min2, max2, 0.1)
 
-        X, Y = np.meshgrid(x,y)
+            X, Y = np.meshgrid(x,y)
 
-        w = self.w
-        shita = self.shita
-        if self.kernel_number == 0:
-            Z = X*w[0] + Y*w[1] - shita
-            print(X)
-            print(Y)
-            print(Z)
-            fig = plt.figure()
-            ax = Axes3D(fig)
-            ax.set_xlabel("x[0]")
-            ax.set_ylabel("x[1]")
-            ax.set_zlabel("y")
-            ax.plot_wireframe(X, Y, Z)
-            ax.scatter(X1, X2, Y1, c="r", marker="^")
-            plt.show()
+            w = self.w
+            shita = self.shita
+            if self.kernel_number == 0:
+                print(w)
+                print(shita)
+                Z = X*w[0] + Y*w[1] - shita
+                fig = plt.figure()
+                ax = Axes3D(fig)
+                ax.set_xlabel("x[0]")
+                ax.set_ylabel("x[1]")
+                ax.set_zlabel("y")
+                ax.plot_wireframe(X, Y, Z)
+                ax.scatter(X1, X2, Y1, c="r", marker="^")
+                plt.show()

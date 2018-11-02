@@ -149,8 +149,8 @@ def perse_csv(file_name):
     x_list = []
     y_list = []
     #属性として指定するリスト
-    taget_list = ["accommodates","availability_365", "number_of_reviews"]
-    taget_list2 = ["security_deposit"]
+    taget_list = ["accommodates","availability_365", "number_of_reviews", "latitude", "longitude"]
+    taget_list2 = ["security_deposit", "cleaning_fee"]
 
     list_of_paralist = []
     for att in taget_list:
@@ -184,4 +184,4 @@ def perse_csv(file_name):
         a = np.zeros(1)
         a[0] = float(pricelist[i].replace(',', ''))
         y_list.append(a)
-    return (x_list[::60], y_list[::60], dim)
+    return (x_list[::20], y_list[::20], dim)

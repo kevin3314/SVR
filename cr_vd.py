@@ -93,8 +93,8 @@ class val_class():
             p_dict = {} 
             score_dict = {}
             for i in [100, 1000]:
-                for j in [ 0.1*x for x in range(1,10,2)]:
-                    for k in range(100,200,5):
+                for j in [ 0.1*x for x in range(1,5,2)]:
+                    for k in range(1,100,5):
                         p_dict["cost"] = i
                         p_dict["epsilon"] = j
                         p_dict["p1"] = k
@@ -112,8 +112,8 @@ class val_class():
             #それぞれのパラメタについて順に検定を行う
             for c in [1,10,100,1000]:
                 for e in [0.1*x for x in range(1,10,2)]:
-                    for i in [ 0.1*x for x in range(1,10,2)]:
-                        for j in [0.1*x for x in range(1,10,2)]:
+                    for i in range(10,15,2):
+                        for j in range(10,15,2):
                             p_dict = {"p1": i, "p2": j, "cost":c, "epsilon":e}
                             score = self.validate(p_dict)
                             x1 = str(c)
