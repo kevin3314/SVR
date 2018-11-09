@@ -144,12 +144,12 @@ def get_datalist(file_name):
         sys.exit()
     return (x_list, y_list, n)
 
-def perse_csv(file_name):
+def perse_csv(file_name, div=60):
     csv_data = pd.read_csv("sanfran.csv")
     x_list = []
     y_list = []
     #属性として指定するリスト
-    taget_list = ["accommodates","availability_365", "number_of_reviews", "latitude", "longitude"]
+    taget_list = ["accommodates","maximum_nights", "number_of_reviews", "latitude", "longitude"]
     taget_list2 = ["security_deposit", "cleaning_fee"]
 
     list_of_paralist = []
@@ -184,4 +184,11 @@ def perse_csv(file_name):
         a = np.zeros(1)
         a[0] = float(pricelist[i].replace(',', ''))
         y_list.append(a)
-    return (x_list[::20], y_list[::20], dim)
+    return (x_list[0:div], y_list[0:div], dim)
+
+def eval_sim(y_list, real_y_list):
+    ans = 0
+    for x,y in zip(y_list, real_y_list):
+        if(x < y):
+            ans += x
+    return (ans / float(len(y_list)))

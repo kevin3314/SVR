@@ -131,23 +131,33 @@ class Svr:
                 self.shita += (alpha_list[i]-alpha_list2[i]) * self.kernel(self.x_list[sup_number-d_n], self.x_list[i])
 
     def eval(self,test_x_list, test_y_list):
-        #SVRの精度を絶対値の差の誤差を求めることによって計算する
+        """
+        SVRの精度を絶対値の差の誤差を求めることによって計算する
+        for cross validation, not for agent simulation
+        """
         sumary = 0
-        if self.kernel_number == 0:
-            for x,y in zip(test_x_list, test_y_list):
-                result = np.dot(self.w, x) - self.shita
-                sumary += abs(y-result)
-            return(sumary / len(test_x_list))
 
+        for x,y in zip(test_x_list, test_y_list):
+            result = self.compute(x)
+            sumary += abs(y-result)
+        return(sumary / len(test_y_list))
+
+    def compute(self, x):
+        if self.kernel_number == 0:
+            result = np.dot(self.w, x) - self.shita
+            return result
         else:
-            d_n = len(self.x_list)
-            for x,y in zip(test_x_list, test_y_list):
-                result = 0
-                for m in range(len(self.x_list)):
-                    result += (self.alpha_list[m]-self.alpha_list2[m])* self.kernel(x, self.x_list[m])
-                result -= self.shita
-                sumary += abs(y-result)
-            return(sumary / len(test_y_list))
+            result = 0
+            for m in range(len(self.x_list)):
+                result += (self.alpha_list[m]-self.alpha_list2[m])* self.kernel(x, self.x_list[m])
+            result -= self.shita
+            return result
+    
+    def simulate(self, sim_x_list, f):
+        y_list = []
+        for i,x in enumerate(sim_x_list):
+            y_list.append(f(self.compute(x)))
+        return y_list
 
     def plot(self):
         if(data_dim == 2):

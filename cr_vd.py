@@ -85,7 +85,7 @@ class val_class():
             print(p_dict2)
             inst = svr.Svr(self.x_list,self.y_list, self.data_dim, self.kernel_number, p_dict2)
             inst.solve()
-            inst.plot()
+            return (inst, min(score_dict.values()))
 
 
         elif(self.kernel_number == 2 or self.kernel_number == 1):
@@ -93,18 +93,27 @@ class val_class():
             p_dict = {} 
             score_dict = {}
             for i in [100, 1000]:
-                for j in [ 0.1*x for x in range(1,5,2)]:
-                    for k in range(1,100,5):
+                for j in [0.3]:
+                    for k in range(100,200,5):
                         p_dict["cost"] = i
                         p_dict["epsilon"] = j
                         p_dict["p1"] = k
                         x1 = str(i)
                         x2 = str(j)
                         x3 = str(k)
-                        score_dict["Cost-"+x1+"/epsilon-"+x2+"/p1-"+x3] = self.validate(p_dict)
+                        score_dict["cost-"+x1+"/epsilon-"+x2+"/p1-"+x3] = self.validate(p_dict)
                     
             print("最良パラメタ:->" + min(score_dict, key=score_dict.get) + "最良スコア->" + str(min(score_dict.values()) ))
+
+            tmp_list = min(score_dict, key=score_dict.get).split("/")
+            p_dict2 = {}
+            for l in tmp_list:
+                t_list = l.split("-")
+                p_dict2[t_list[0]] = float(t_list[1])
+            inst = svr.Svr(self.x_list,self.y_list, self.data_dim, self.kernel_number, p_dict2)
+            inst.solve()
             
+            return (inst, min(score_dict.values()))
 
         else:
             #シグモイドカーネルの時 
@@ -124,3 +133,13 @@ class val_class():
                             score_dict["Cost-"+x1+"epsilon-"+x2+"p1-"+x3+"p2-"+x4] = score
             #最良スコアの値とパラメタを表示する
             print("最良パラメタ:->" + min(score_dict, key=score_dict.get) + "最良スコア->" + str(min(score_dict.values()) ))
+
+            tmp_list = min(score_dict, key=score_dict.get).split("/")
+            p_dict2 = {}
+            for l in tmp_list:
+                t_list = l.split("-")
+                p_dict2[t_list[0]] = float(t_list[1])
+            inst = svr.Svr(self.x_list,self.y_list, self.data_dim, self.kernel_number, p_dict2)
+            inst.solve()
+            
+            return (inst, min(score_dict.values()))
