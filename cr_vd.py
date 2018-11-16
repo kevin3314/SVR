@@ -94,7 +94,7 @@ class val_class():
             score_dict = {}
             for i in [100, 1000]:
                 for j in [0.3]:
-                    for k in range(100,200,5):
+                    for k in range(50,200,5):
                         p_dict["cost"] = i
                         p_dict["epsilon"] = j
                         p_dict["p1"] = k

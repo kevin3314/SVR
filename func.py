@@ -144,34 +144,109 @@ def get_datalist(file_name):
         sys.exit()
     return (x_list, y_list, n)
 
-def perse_csv(file_name, div=60):
+def perse_csv(file_name, div=500):
     csv_data = pd.read_csv("sanfran.csv")
     x_list = []
     y_list = []
     #属性として指定するリスト
-    taget_list = ["accommodates","maximum_nights", "number_of_reviews", "latitude", "longitude"]
-    taget_list2 = ["security_deposit", "cleaning_fee"]
+    #人数
+    taget_list = ["accommodates"]
+    #緯度・経度
+    taget_list3 = ["longitude","latitude"]
+    #賃貸の形態（アパート、家など)
+    taget_list4 = ["property_type"]
+    taget_list2 = ["room_type"]
 
     list_of_paralist = []
     for att in taget_list:
         tmp_list = [x for x in csv_data[att]]
-        new_list = [x / max(tmp_list) for x in tmp_list]
-        list_of_paralist.append(new_list)
+        list_of_paralist.append(tmp_list)
+
+    for att in taget_list4:
+        tmp_list = [x for x in csv_data[att]]
+        ap_list = []
+        hou_list = []
+        cond_list = []
+        gest_list = []
+        other_list = []
+        for element in tmp_list:
+            if element == "Apartment":
+                ap_list.append(1)
+                hou_list.append(0)
+                cond_list.append(0)
+                gest_list.append(0)
+                other_list.append(0)
+            elif element == "House":
+                ap_list.append(0)
+                hou_list.append(1)
+                cond_list.append(0)
+                gest_list.append(0)
+                other_list.append(0)
+            elif element == "Condominium":
+                ap_list.append(0)
+                hou_list.append(0)
+                cond_list.append(1)
+                gest_list.append(0)
+                other_list.append(0)
+            elif element == "Guest suite":
+                ap_list.append(0)
+                hou_list.append(0)
+                cond_list.append(0)
+                gest_list.append(1)
+                other_list.append(0)
+            else:
+                ap_list.append(0)
+                hou_list.append(0)
+                cond_list.append(0)
+                gest_list.append(0)
+                other_list.append(1)
+
+        list_of_paralist.append(ap_list)
+        list_of_paralist.append(hou_list)
+        list_of_paralist.append(cond_list)
+        list_of_paralist.append(gest_list)
+        list_of_paralist.append(other_list)
 
     for att in taget_list2:
         tmp_list = [x for x in csv_data[att]]
-        tmp_list2 = []
-        for x in tmp_list:
-            if (type(x) is str):
-                tmp_list2.append(float(x[1:].replace(',', '')))
+        entire_list = []
+        pri_list = []
+        other_list = []
+        for element in tmp_list:
+            if element == "Entire home/apt":
+                entire_list.append(1)
+                pri_list.append(0)
+                other_list.append(0)
+            elif element == "Private room":
+                entire_list.append(0)
+                pri_list.append(1)
+                other_list.append(0)
             else:
-                tmp_list2.append(0.0)
-        new_list = [x / max(tmp_list2) for x in tmp_list2]
-        list_of_paralist.append(new_list)
+                entire_list.append(0)
+                pri_list.append(0)
+                other_list.append(1)
 
+        list_of_paralist.append(entire_list)
+        list_of_paralist.append(pri_list)
+        list_of_paralist.append(other_list)
+
+    for att in taget_list3:
+        tmp_list = [x for x in csv_data[att]]
+        tmp_list = [abs(x) for x in tmp_list]
+        mini = min(tmp_list)
+        tmp_list = [x-mini for x in tmp_list]
+        list_of_paralist.append(tmp_list)
+
+    #データの次元
     dim = len(list_of_paralist)
+    #データの数
     vec_n = len(list_of_paralist[0])
 
+    #各リストについて正規化する
+    for i in range(len(list_of_paralist)):
+        list_of_paralist = [normal_list(l) for l in list_of_paralist]
+
+    #リストをベクトルに変換する
     for i in range(vec_n): 
         a = np.zeros(dim)
         for j,l in enumerate(list_of_paralist):
@@ -180,6 +255,7 @@ def perse_csv(file_name, div=60):
 
     pricelist = [x[1:] for x in csv_data["price"]]
 
+    #料金のベクトルを得る
     for i in range(vec_n):
         a = np.zeros(1)
         a[0] = float(pricelist[i].replace(',', ''))
@@ -191,4 +267,18 @@ def eval_sim(y_list, real_y_list):
     for x,y in zip(y_list, real_y_list):
         if(x < y):
             ans += x
-    return (ans / float(len(y_list)))
+    return ans
+
+def eval_sim_lists(nor_list, les_list, real_y_list):
+    nor_ans = 0
+    les_ans = 0
+    lis_ans = 0
+    for x,y,z in zip(nor_list, les_list, real_y_list):
+        if x<z and x<y:
+            nor_ans += x
+        elif y<x and y<z:
+            les_ans += y
+        else:
+            lis_ans += z
+
+    return (nor_ans, les_ans, lis_ans)

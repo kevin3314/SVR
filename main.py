@@ -29,12 +29,11 @@ try:
 except IndexError:
     print("エラー:第三引数には分割数を入力してください")
     sys.exit()
+
 try:
-    write_name = args[4]
+    div_n = args[4]
 except IndexError:
-    today = datetime.datetime.today()
-    day = str(today.year)+str(today.month)+str(today.day)+str(today.hour)+str(today.minute)+str(today.second)
-    write_name = day
+    pass
 
 #csvかどうかを判定
 pattern = ".*\.csv"
@@ -43,7 +42,8 @@ result = re.match(pattern, file_name)
 if result:
     (xlist, ylist, data_dim) = func.perse_csv(file_name)
 else:
-    (xlist, ylist, data_dim) = func.get_datalist(file_name)
+    pritn("csvファイル名を入力してください")
+    sys.exit()
 
 cr_vd = cr_vd.val_class(xlist, ylist, data_dim, kernel_number, cross_n)
 cr_vd.sol_pera()

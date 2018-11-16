@@ -99,6 +99,9 @@ class Svr:
         self.P = matrix(self.P) 
 
     def solve(self):
+        """
+        実際に解を求める
+        """
         sol = solvers.qp(P=self.P, q=self.q, G=self.G, h=self.h, A=self.A, b=self.b) 
         d_n = len(self.x_list)
         #alphaのリストを作る
@@ -132,17 +135,19 @@ class Svr:
 
     def eval(self,test_x_list, test_y_list):
         """
-        SVRの精度を絶対値の差の誤差を求めることによって計算する
-        for cross validation, not for agent simulation
+        SVRの精度を二乗誤差を求めることによって計算する（交差検定用）
         """
         sumary = 0
 
         for x,y in zip(test_x_list, test_y_list):
             result = self.compute(x)
-            sumary += abs(y-result)
+            sumary += (y-result)[0]*(y-result)[0]
         return(sumary / len(test_y_list))
 
     def compute(self, x):
+        """
+        与えられたベクトルについて、学習したSVRで値を予測する
+        """
         if self.kernel_number == 0:
             result = np.dot(self.w, x) - self.shita
             return result
@@ -154,12 +159,18 @@ class Svr:
             return result
     
     def simulate(self, sim_x_list, f):
+        """
+        与えられたリストについて予測した値に関数fを適用させた値のリストを得る。
+        """
         y_list = []
         for i,x in enumerate(sim_x_list):
             y_list.append(f(self.compute(x)))
         return y_list
 
     def plot(self):
+        """
+        データの次元が二次元の場合、テストデータについてSVRの予測結果と学習データを表示する
+        """
         if(data_dim == 2):
             x_list = []
             y_list = []
